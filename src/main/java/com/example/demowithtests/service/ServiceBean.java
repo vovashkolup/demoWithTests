@@ -6,8 +6,10 @@ import com.example.demowithtests.util.*;
 import com.example.demowithtests.util.IllegalArgumentException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -80,6 +82,7 @@ public class ServiceBean implements Service {
 
     @Override
     public void removeAll() {
+
         try {
             repository.deleteAll();
         } catch (NullPointerException e) {
@@ -87,6 +90,49 @@ public class ServiceBean implements Service {
         } catch (InvalidAccessException e) {
             throw new InvalidAccessException();
         }
-
     }
+
+
+    @Override
+    public List<Employee> processor() {
+        log.info("replace null  - start");
+        List<Employee> replaceNull = repository.findEmployeeByIsDeletedNull();
+        log.info("replace null after replace: " + replaceNull);
+        for (Employee emp : replaceNull) {
+            emp.setIsDeleted(Boolean.FALSE);
+        }
+        log.info("replaceNull = {} ", replaceNull);
+        log.info("replace null  - end:");
+        return repository.saveAll(replaceNull);
+    }
+
+    @Override
+    public List<Employee> sendEmailByCountry(String country, String text) {
+        List<Employee> employees = repository.findEmployeeByCountry(country);
+        mailSender(extracted(employees), text);
+        return employees;
+    }
+
+    @Override
+    public List<Employee> sendEmailByCity(String city, String text) {
+        List<Employee> employees = repository.findEmployeeByAddresses(city);
+        mailSender(extracted(employees), text);
+        return employees;
+    }
+
+
+    private static List<String> extracted(List<Employee> employees) {
+        List<String> emails = new ArrayList<>();
+        //Arrays.asList();
+        for (Employee emp : employees) {
+            emails.add(emp.getEmail());
+        }
+        return emails;
+    }
+
+
+    public void mailSender(List<String> emails, String text) {
+        log.info("Emails were successfully sent");
+    }
+
 }
