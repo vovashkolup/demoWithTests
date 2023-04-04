@@ -30,5 +30,10 @@ public class Employee {
     @JoinColumn(name = "employee_id")
     private Set<Address> addresses = new HashSet<>();
 
+    public Employee(String name, String country, String email) {
+        this.name = name;
+        this.country = country;
+        this.email = email;
+    }
 }
 

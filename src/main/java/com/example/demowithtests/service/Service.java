@@ -24,4 +24,11 @@ public interface Service {
 
     List<Employee> sendEmailByCity(String city, String text);
 
+    String generateCountry();
+
+    void autoFillData(String name,String country,String email);
+
+    void randomUpdateDataByCountry(Integer startID, Integer endID);
+    void smartUpdateDataByCountry(Integer startID, Integer endID,String country);
+
 }

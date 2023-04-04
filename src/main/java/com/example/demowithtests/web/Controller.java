@@ -77,6 +77,25 @@ public class Controller {
     @PostMapping("/sendEmailByCity")
     @ResponseStatus(HttpStatus.OK)
     public void sendEmailByCity(@RequestParam String city, @RequestParam String text){
-        service.sendEmailByCountry(city, text);
+        service.sendEmailByCity(city, text);
+    }
+
+    @PostMapping("/autoFillData")
+    @ResponseStatus(HttpStatus.OK)
+    public void autoFillData(@RequestParam String name, @RequestParam String country,@RequestParam String email){
+        service.autoFillData(name, country, email);
+    }
+
+    @PostMapping ("/randomUpdateDataByCountry")
+    @ResponseStatus(HttpStatus.OK)
+    public void randomUpdateDataByCountry(@RequestParam Integer startID, @RequestParam Integer endID){
+        service.randomUpdateDataByCountry(startID,endID);
+    }
+
+    @PostMapping ("/smartUpdateDataByCountry")
+    @ResponseStatus(HttpStatus.OK)
+    public void smartUpdateDataByCountry(@RequestParam Integer startID, @RequestParam Integer endID, @RequestParam String country){
+        service.smartUpdateDataByCountry(startID,endID,country);
     }
 }
+

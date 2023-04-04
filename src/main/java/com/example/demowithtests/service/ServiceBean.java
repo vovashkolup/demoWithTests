@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @AllArgsConstructor
 @Slf4j
@@ -18,6 +19,12 @@ import java.util.List;
 public class ServiceBean implements Service {
 
     private final Repository repository;
+    private static ArrayList<String> countries = new ArrayList<>(List.of(
+            "Germany", "Ukraine", "Poland", "Turkey",
+            "Slovenia", "France", "USA",
+            "United Kingdom", "Latvia", "Estonia"));
+    private static final Random random=new Random();
+
 
     @Override
     public Employee create(Employee employee) {
@@ -115,9 +122,46 @@ public class ServiceBean implements Service {
 
     @Override
     public List<Employee> sendEmailByCity(String city, String text) {
-        List<Employee> employees = repository.findEmployeeByAddresses(city);
+        List<Employee> employees = repository.findEmployeeByCity(city);
         mailSender(extracted(employees), text);
         return employees;
+    }
+
+    @Override
+    public String generateCountry() {
+        String countryNumber=countries.get(random.nextInt(countries.size()));
+        return countryNumber;
+    }
+
+    @Override
+    public void autoFillData(String name,String country, String email) {
+        for(int i=0;i<10000;i++){
+            Employee employee=new Employee(name,country,email);
+            repository.save(employee);
+        }
+    }
+
+    @Override
+    public void randomUpdateDataByCountry(Integer startID, Integer endID) {
+        String country=generateCountry();
+        log.info("Country is "+country);
+        List<Employee> usersList=repository.findEmployeeByID(startID,endID);
+        for (Employee emp:usersList) {
+            emp.setCountry(country);
+        }
+        repository.saveAll(usersList);
+
+    }
+
+    @Override
+    public void smartUpdateDataByCountry(Integer startID, Integer endID, String country) {
+        List<Employee> usersList=repository.findEmployeeByID(startID,endID);
+        for (Employee emp:usersList) {
+            if(!emp.getCountry().equals(country)){
+                emp.setCountry(country);
+            }
+        }
+        repository.saveAll(usersList);
     }
 
 
@@ -132,7 +176,12 @@ public class ServiceBean implements Service {
 
 
     public void mailSender(List<String> emails, String text) {
-        log.info("Emails were successfully sent");
+        log.info("List size is " + emails.size());
+        if (emails.size() == 0) {
+            log.warn("Email list size is 0!");
+        } else {
+            log.info("Emails were successfully sent");
+        }
     }
 
 }
